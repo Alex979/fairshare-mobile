@@ -40,14 +40,12 @@ export default function ResultsPanel({
     });
   };
 
-  const handleVenmoPress = (venmoLink: string) => {
-    Linking.canOpenURL(venmoLink).then((supported) => {
-      if (supported) {
-        Linking.openURL(venmoLink);
-      } else {
-        console.log("Venmo app not available");
-      }
-    });
+  const handleVenmoPress = async (venmoLink: string) => {
+    try {
+      await Linking.openURL(venmoLink);
+    } catch {
+      console.log("Venmo app not available");
+    }
   };
 
   return (
