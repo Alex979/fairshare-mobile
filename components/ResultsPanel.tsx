@@ -188,21 +188,21 @@ const createStyles = (isDark: boolean, bottomInset: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: isDark ? "#1F2937" : "#fff",
+      backgroundColor: isDark ? "#111827" : "#F3F4F6",
     },
     header: {
       padding: 16,
-      backgroundColor: isDark ? "#000" : "#111827",
+      backgroundColor: isDark ? "#111827" : "#F3F4F6",
     },
     headerTitle: {
       fontSize: 18,
       fontWeight: "bold",
-      color: "#fff",
+      color: isDark ? "#fff" : "#1F2937",
       marginBottom: 4,
     },
     headerSubtitle: {
       fontSize: 12,
-      color: "#9CA3AF",
+      color: isDark ? "#9CA3AF" : "#6B7280",
     },
     scrollView: {
       flex: 1,
@@ -213,11 +213,11 @@ const createStyles = (isDark: boolean, bottomInset: number) =>
       paddingBottom: 32,
     },
     userCard: {
-      backgroundColor: isDark ? "#374151" : "#F9FAFB",
+      backgroundColor: isDark ? "#1F2937" : "#fff",
       borderRadius: 12,
       padding: 16,
       borderWidth: 1,
-      borderColor: isDark ? "#4B5563" : "#E5E7EB",
+      borderColor: isDark ? "#374151" : "#E5E7EB",
     },
     userCardUnassigned: {
       backgroundColor: isDark ? "#7F1D1D" : "#FEE2E2",
@@ -279,7 +279,7 @@ const createStyles = (isDark: boolean, bottomInset: number) =>
       marginTop: 12,
       paddingTop: 12,
       borderTopWidth: 1,
-      borderTopColor: isDark ? "#4B5563" : "#E5E7EB",
+      borderTopColor: isDark ? "#374151" : "#E5E7EB",
     },
     itemsHeader: {
       flexDirection: "row",
@@ -316,7 +316,7 @@ const createStyles = (isDark: boolean, bottomInset: number) =>
       paddingTop: 16,
       paddingHorizontal: 16,
       paddingBottom: Math.max(bottomInset, 16) + 8,
-      backgroundColor: isDark ? "#1F2937" : "#F9FAFB",
+      backgroundColor: isDark ? "#1F2937" : "#fff",
       borderTopWidth: 1,
       borderTopColor: isDark ? "#374151" : "#E5E7EB",
       gap: 6,
