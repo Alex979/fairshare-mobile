@@ -1,16 +1,16 @@
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
-  View,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
   useColorScheme,
-  ScrollView,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { BillData, LineItem } from "../types";
 import { formatMoney } from "../lib/bill-utils";
 import { WEIGHT_INCREMENT, WEIGHT_INITIAL, WEIGHT_MIN } from "../lib/constants";
+import { BillData, LineItem } from "../types";
 
 interface LineItemsListProps {
   data: BillData;
@@ -18,7 +18,11 @@ interface LineItemsListProps {
   setActiveItemId: (id: string | null) => void;
   onOpenAddModal: () => void;
   onOpenEditModal: (item: LineItem) => void;
-  onUpdateSplit: (itemId: string, participantId: string, weight: number) => void;
+  onUpdateSplit: (
+    itemId: string,
+    participantId: string,
+    weight: number
+  ) => void;
 }
 
 export default function LineItemsList({
@@ -52,10 +56,7 @@ export default function LineItemsList({
           return (
             <View
               key={item.id}
-              style={[
-                styles.itemCard,
-                isExpanded && styles.itemCardExpanded,
-              ]}
+              style={[styles.itemCard, isExpanded && styles.itemCardExpanded]}
             >
               <TouchableOpacity
                 style={styles.itemHeader}
@@ -63,8 +64,12 @@ export default function LineItemsList({
               >
                 <View style={styles.itemInfo}>
                   <View style={styles.itemTopRow}>
-                    <Text style={styles.itemDescription}>{item.description}</Text>
-                    <Text style={styles.itemPrice}>{formatMoney(item.total_price)}</Text>
+                    <Text style={styles.itemDescription}>
+                      {item.description}
+                    </Text>
+                    <Text style={styles.itemPrice}>
+                      {formatMoney(item.total_price)}
+                    </Text>
                   </View>
 
                   <View style={styles.itemBottomRow}>
@@ -79,7 +84,10 @@ export default function LineItemsList({
                             (p) => p.id === a.participant_id
                           );
                           return person ? (
-                            <View key={a.participant_id} style={styles.miniAvatar}>
+                            <View
+                              key={a.participant_id}
+                              style={styles.miniAvatar}
+                            >
                               <Text style={styles.miniAvatarText}>
                                 {person.name.charAt(0).toUpperCase()}
                               </Text>
@@ -147,7 +155,10 @@ export default function LineItemsList({
                                 onUpdateSplit(
                                   item.id,
                                   p.id,
-                                  Math.max(WEIGHT_MIN, weight - WEIGHT_INCREMENT)
+                                  Math.max(
+                                    WEIGHT_MIN,
+                                    weight - WEIGHT_INCREMENT
+                                  )
                                 )
                               }
                             >
@@ -157,12 +168,18 @@ export default function LineItemsList({
                             <Text style={styles.weightValue}>{weight}</Text>
 
                             <TouchableOpacity
-                              style={[styles.weightButton, styles.weightButtonPlus]}
+                              style={[
+                                styles.weightButton,
+                                styles.weightButtonPlus,
+                              ]}
                               onPress={() =>
                                 onUpdateSplit(
                                   item.id,
                                   p.id,
-                                  weight + (weight === WEIGHT_MIN ? WEIGHT_INITIAL : WEIGHT_INCREMENT)
+                                  weight +
+                                    (weight === WEIGHT_MIN
+                                      ? WEIGHT_INITIAL
+                                      : WEIGHT_INCREMENT)
                                 )
                               }
                             >
@@ -391,4 +408,3 @@ const createStyles = (isDark: boolean) =>
       textAlign: "center",
     },
   });
-

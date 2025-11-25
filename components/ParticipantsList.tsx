@@ -1,16 +1,16 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  View,
+  Alert,
+  Modal,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   useColorScheme,
-  Alert,
-  ScrollView,
-  Modal,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { Participant } from "../types";
 
 interface ParticipantsListProps {
@@ -28,7 +28,8 @@ export default function ParticipantsList({
 }: ParticipantsListProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const [editingParticipant, setEditingParticipant] = useState<Participant | null>(null);
+  const [editingParticipant, setEditingParticipant] =
+    useState<Participant | null>(null);
   const [editName, setEditName] = useState("");
   const styles = createStyles(isDark);
 
@@ -41,7 +42,7 @@ export default function ParticipantsList({
     const participant = onAddParticipant();
     setEditingParticipant(participant);
     setEditName(participant.name);
-  }
+  };
 
   const handleSave = () => {
     if (editingParticipant && editName.trim()) {
@@ -52,21 +53,21 @@ export default function ParticipantsList({
 
   const handleDelete = () => {
     if (!editingParticipant) return;
-    
+
     if (participants.length === 1) {
       Alert.alert("Cannot Delete", "You must have at least one participant.");
       return;
     }
-    
+
     Alert.alert("Delete Participant", `Remove ${editingParticipant.name}?`, [
       { text: "Cancel", style: "cancel" },
-      { 
-        text: "Delete", 
-        style: "destructive", 
+      {
+        text: "Delete",
+        style: "destructive",
         onPress: () => {
           onDeleteParticipant(editingParticipant.id);
           setEditingParticipant(null);
-        }
+        },
       },
     ]);
   };
@@ -78,8 +79,8 @@ export default function ParticipantsList({
         <Text style={styles.count}>{participants.length}</Text>
       </View>
 
-      <ScrollView 
-        horizontal 
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.chipsList}
       >
@@ -90,12 +91,16 @@ export default function ParticipantsList({
             onPress={() => handleChipPress(p)}
           >
             <View style={styles.chipAvatar}>
-              <Text style={styles.chipAvatarText}>{p.name.charAt(0).toUpperCase()}</Text>
+              <Text style={styles.chipAvatarText}>
+                {p.name.charAt(0).toUpperCase()}
+              </Text>
             </View>
-            <Text style={styles.chipName} numberOfLines={1}>{p.name}</Text>
+            <Text style={styles.chipName} numberOfLines={1}>
+              {p.name}
+            </Text>
           </TouchableOpacity>
         ))}
-        
+
         <TouchableOpacity style={styles.addChip} onPress={handleAdd}>
           <Ionicons name="add" size={20} color="#2563EB" />
         </TouchableOpacity>
@@ -108,14 +113,17 @@ export default function ParticipantsList({
         transparent
         onRequestClose={() => setEditingParticipant(null)}
       >
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
-          activeOpacity={1} 
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
           onPress={() => setEditingParticipant(null)}
         >
-          <View style={styles.modalContent} onStartShouldSetResponder={() => true}>
+          <View
+            style={styles.modalContent}
+            onStartShouldSetResponder={() => true}
+          >
             <Text style={styles.modalTitle}>Edit Participant</Text>
-            
+
             <TextInput
               style={styles.modalInput}
               value={editName}
@@ -125,12 +133,15 @@ export default function ParticipantsList({
               autoFocus
               selectTextOnFocus
             />
-            
+
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={handleDelete}
+              >
                 <Ionicons name="trash-outline" size={18} color="#EF4444" />
               </TouchableOpacity>
-              
+
               <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                 <Text style={styles.saveButtonText}>Save</Text>
               </TouchableOpacity>

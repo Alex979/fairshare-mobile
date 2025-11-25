@@ -1,6 +1,12 @@
-import React from "react";
-import { View, Text, ActivityIndicator, StyleSheet, useColorScheme } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 
 export default function ProcessingScreen() {
   const colorScheme = useColorScheme();
@@ -13,9 +19,13 @@ export default function ProcessingScreen() {
         <View style={styles.iconContainer}>
           <Ionicons name="document-text" size={48} color="#2563EB" />
         </View>
-        
-        <ActivityIndicator size="large" color="#2563EB" style={styles.spinner} />
-        
+
+        <ActivityIndicator
+          size="large"
+          color="#2563EB"
+          style={styles.spinner}
+        />
+
         <Text style={styles.title}>Processing Receipt</Text>
         <Text style={styles.subtitle}>
           AI is analyzing your receipt and splitting the bill...
@@ -64,4 +74,3 @@ const createStyles = (isDark: boolean) =>
       lineHeight: 20,
     },
   });
-

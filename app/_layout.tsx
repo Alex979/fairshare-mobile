@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
+import { StyleSheet, useColorScheme, View } from "react-native";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { BillProvider } from "../context/BillContext";
-import { useColorScheme, View, StyleSheet } from "react-native";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -21,14 +21,17 @@ export default function RootLayout() {
             }}
           >
             <Stack.Screen name="index" />
-            <Stack.Screen 
-              name="editor" 
+            <Stack.Screen
+              name="editor"
               options={{
                 gestureEnabled: true,
                 fullScreenGestureEnabled: false,
               }}
             />
-            <Stack.Screen name="processing" options={{ gestureEnabled: false }} />
+            <Stack.Screen
+              name="processing"
+              options={{ gestureEnabled: false }}
+            />
           </Stack>
         </BillProvider>
       </KeyboardProvider>

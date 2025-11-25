@@ -1,20 +1,20 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Modal,
-  StyleSheet,
-  useColorScheme,
-  Platform,
   Alert,
   Animated,
   Dimensions,
+  Modal,
   PanResponder,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useColorScheme,
+  View,
 } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
-import { Ionicons } from "@expo/vector-icons";
 import { LineItem } from "../types";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
@@ -94,7 +94,7 @@ export default function ItemModal({
       slideAnim.setValue(SCREEN_HEIGHT);
       dragY.setValue(0);
       backdropOpacity.setValue(0);
-      
+
       // Small delay to let layout settle before animating
       // This prevents the keyboard animation from compounding with ours
       const timeout = setTimeout(() => {
@@ -113,7 +113,7 @@ export default function ItemModal({
           }),
         ]).start();
       }, 10);
-      
+
       return () => clearTimeout(timeout);
     } else {
       // Animate out
@@ -144,10 +144,7 @@ export default function ItemModal({
       Alert.alert("Invalid Input", "Please enter a description");
       return;
     }
-    if (
-      editingItem.total_price === undefined ||
-      editingItem.total_price < 0
-    ) {
+    if (editingItem.total_price === undefined || editingItem.total_price < 0) {
       Alert.alert("Invalid Input", "Please enter a valid price");
       return;
     }
@@ -161,17 +158,9 @@ export default function ItemModal({
       transparent
       onRequestClose={onClose}
     >
-      <KeyboardAvoidingView
-        style={styles.overlay}
-        behavior="padding"
-      >
+      <KeyboardAvoidingView style={styles.overlay} behavior="padding">
         {/* Backdrop - fades in */}
-        <Animated.View 
-          style={[
-            styles.backdrop,
-            { opacity: backdropOpacity }
-          ]}
-        >
+        <Animated.View style={[styles.backdrop, { opacity: backdropOpacity }]}>
           <TouchableOpacity
             style={StyleSheet.absoluteFill}
             activeOpacity={1}
@@ -180,22 +169,19 @@ export default function ItemModal({
         </Animated.View>
 
         {/* Modal content - slides up */}
-        <Animated.View 
+        <Animated.View
           style={[
             styles.modalContent,
-            { 
-              transform: [
-                { translateY: slideAnim },
-                { translateY: dragY }
-              ] 
-            }
+            {
+              transform: [{ translateY: slideAnim }, { translateY: dragY }],
+            },
           ]}
         >
           {/* Draggable handle area */}
           <View {...panResponder.panHandlers} style={styles.handleArea}>
             <View style={styles.handle} />
           </View>
-          
+
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>
               {isEditing ? "Edit Item" : "Add Item"}
@@ -297,7 +283,7 @@ const createStyles = (isDark: boolean) =>
     handleArea: {
       paddingVertical: 12,
       alignItems: "center",
-      cursor: "grab",
+      cursor: "grab" as any, // Web-only property
     },
     handle: {
       width: 36,

@@ -1,7 +1,16 @@
 import { BillData, CalculatedTotals, CalculatedUserTotal } from "../types";
-import { DEFAULT_CURRENCY, CURRENCY_LOCALE, VENMO_NOTE_MAX_LENGTH, UNASSIGNED_ID, UNASSIGNED_NAME } from "./constants";
+import {
+  CURRENCY_LOCALE,
+  DEFAULT_CURRENCY,
+  UNASSIGNED_ID,
+  UNASSIGNED_NAME,
+  VENMO_NOTE_MAX_LENGTH,
+} from "./constants";
 
-export const formatMoney = (amount: number, currency: string = DEFAULT_CURRENCY) => {
+export const formatMoney = (
+  amount: number,
+  currency: string = DEFAULT_CURRENCY
+) => {
   return new Intl.NumberFormat(CURRENCY_LOCALE, {
     style: "currency",
     currency: currency,
@@ -19,7 +28,9 @@ export const generateVenmoLink = (user: CalculatedUserTotal) => {
   )}`;
 };
 
-export const calculateTotals = (data: BillData | null): CalculatedTotals | null => {
+export const calculateTotals = (
+  data: BillData | null
+): CalculatedTotals | null => {
   if (!data) return null;
 
   const totals: Record<string, CalculatedUserTotal> = {};
@@ -75,7 +86,10 @@ export const calculateTotals = (data: BillData | null): CalculatedTotals | null 
     });
   });
 
-  const getModValue = (mod: { type: 'fixed' | 'percentage'; value: number } | undefined, basis: number): number => {
+  const getModValue = (
+    mod: { type: "fixed" | "percentage"; value: number } | undefined,
+    basis: number
+  ): number => {
     if (!mod || mod.value === undefined || mod.value === null) return 0;
     return mod.type === "percentage" ? basis * (mod.value / 100) : mod.value;
   };
@@ -100,4 +114,3 @@ export const calculateTotals = (data: BillData | null): CalculatedTotals | null 
     byUser: totals,
   };
 };
-

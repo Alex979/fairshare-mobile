@@ -1,11 +1,17 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { processReceipt } from "../lib/api";
 import { calculateTotals } from "../lib/bill-utils";
 import {
   DEFAULT_NEW_PARTICIPANT_NAME,
   DEFAULT_PRICE,
   DEFAULT_QUANTITY,
-  MOCK_DATA
+  MOCK_DATA,
 } from "../lib/constants";
 import { getOpenRouterApiKey } from "../lib/env";
 import { compressImage } from "../lib/image-utils";
@@ -15,7 +21,7 @@ import {
   isValidPrice,
   isValidWeight,
   sanitizeItemDescription,
-  sanitizeParticipantName
+  sanitizeParticipantName,
 } from "../lib/validation";
 import { BillData, CalculatedTotals, LineItem, Participant } from "../types";
 
@@ -27,18 +33,22 @@ interface BillContextType {
   setPromptText: (text: string) => void;
   error: string | null;
   isProcessing: boolean;
-  
+
   // Bill data
   data: BillData | null;
   calculatedTotals: CalculatedTotals | null;
-  
+
   // Actions
   processReceiptAction: () => Promise<boolean>;
   loadMockData: () => void;
   resetAll: () => void;
-  
+
   // Bill editing
-  updateItemSplit: (itemId: string, participantId: string, weight: number) => void;
+  updateItemSplit: (
+    itemId: string,
+    participantId: string,
+    weight: number
+  ) => void;
   updateModifier: (key: "tax" | "tip", field: string, value: any) => void;
   updateParticipantName: (id: string, name: string) => void;
   addParticipant: () => Participant;
@@ -66,38 +76,39 @@ export function BillProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const apiKey = getOpenRouterApiKey();
-      const base64Data = imageUri ? await compressImage(imageUri) : ""; 
+      const base64Data = imageUri ? await compressImage(imageUri) : "";
 
-      const parsedData = await processReceipt(base64Data, promptText, apiKey) as BillData;
+      const parsedData = (await processReceipt(
+        base64Data,
+        promptText,
+        apiKey
+      )) as BillData;
 
       if (!isValidBillData(parsedData)) {
         throw new Error("Invalid response structure from API");
       }
 
-      parsedData.participants = parsedData.participants.map(
-        (p, i) => ({ 
-          ...p, 
-          id: p.id || `p${i}`,
-          name: sanitizeParticipantName(p.name)
-        })
-      );
-      parsedData.line_items = parsedData.line_items.map(
-        (item, i) => ({ 
-          ...item,
-          id: item.id || `item${i}`,
-          description: sanitizeItemDescription(item.description),
-          quantity: Math.max(1, item.quantity || 1),
-          unit_price: Math.max(0, item.unit_price || 0),
-          total_price: Math.max(0, item.total_price || 0)
-        })
-      );
+      parsedData.participants = parsedData.participants.map((p, i) => ({
+        ...p,
+        id: p.id || `p${i}`,
+        name: sanitizeParticipantName(p.name),
+      }));
+      parsedData.line_items = parsedData.line_items.map((item, i) => ({
+        ...item,
+        id: item.id || `item${i}`,
+        description: sanitizeItemDescription(item.description),
+        quantity: Math.max(1, item.quantity || 1),
+        unit_price: Math.max(0, item.unit_price || 0),
+        total_price: Math.max(0, item.total_price || 0),
+      }));
 
       setData(parsedData);
       setIsProcessing(false);
       return true;
     } catch (err) {
       console.error(err);
-      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
+      const errorMessage =
+        err instanceof Error ? err.message : "An unexpected error occurred";
       setError("Failed to process. " + errorMessage);
       setIsProcessing(false);
       return false;
@@ -116,59 +127,74 @@ export function BillProvider({ children }: { children: React.ReactNode }) {
     setIsProcessing(false);
   }, []);
 
-  const updateItemSplit = useCallback((
-    itemId: string,
-    participantId: string,
-    newWeight: number
-  ) => {
-    if (!isValidWeight(newWeight)) return;
+  const updateItemSplit = useCallback(
+    (itemId: string, participantId: string, newWeight: number) => {
+      if (!isValidWeight(newWeight)) return;
 
-    setData((prev) => {
-      if (!prev) return null;
-      const newData = { ...prev };
-      newData.split_logic = [...prev.split_logic];
+      setData((prev) => {
+        if (!prev) return null;
+        const newData = { ...prev };
+        newData.split_logic = [...prev.split_logic];
 
-      const logicIndex = newData.split_logic.findIndex((l) => l.item_id === itemId);
+        const logicIndex = newData.split_logic.findIndex(
+          (l) => l.item_id === itemId
+        );
 
-      if (logicIndex === -1) {
-        if (newWeight > 0) {
-          newData.split_logic.push({
-            item_id: itemId,
-            method: "ratio",
-            allocations: [{ participant_id: participantId, weight: newWeight }],
-          });
+        if (logicIndex === -1) {
+          if (newWeight > 0) {
+            newData.split_logic.push({
+              item_id: itemId,
+              method: "ratio",
+              allocations: [
+                { participant_id: participantId, weight: newWeight },
+              ],
+            });
+          }
+        } else {
+          const logic = {
+            ...newData.split_logic[logicIndex],
+            allocations: [...newData.split_logic[logicIndex].allocations],
+          };
+          const allocIndex = logic.allocations.findIndex(
+            (a) => a.participant_id === participantId
+          );
+
+          if (allocIndex > -1) {
+            if (newWeight <= 0) logic.allocations.splice(allocIndex, 1);
+            else
+              logic.allocations[allocIndex] = {
+                ...logic.allocations[allocIndex],
+                weight: newWeight,
+              };
+          } else if (newWeight > 0) {
+            logic.allocations.push({
+              participant_id: participantId,
+              weight: newWeight,
+            });
+          }
+          newData.split_logic[logicIndex] = logic;
         }
-      } else {
-        const logic = {
-          ...newData.split_logic[logicIndex],
-          allocations: [...newData.split_logic[logicIndex].allocations],
+        return newData;
+      });
+    },
+    []
+  );
+
+  const updateModifier = useCallback(
+    (key: "tax" | "tip", field: string, value: any) => {
+      setData((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          modifiers: {
+            ...prev.modifiers,
+            [key]: { ...prev.modifiers[key], [field]: value },
+          },
         };
-        const allocIndex = logic.allocations.findIndex((a) => a.participant_id === participantId);
-
-        if (allocIndex > -1) {
-          if (newWeight <= 0) logic.allocations.splice(allocIndex, 1);
-          else logic.allocations[allocIndex] = { ...logic.allocations[allocIndex], weight: newWeight };
-        } else if (newWeight > 0) {
-          logic.allocations.push({ participant_id: participantId, weight: newWeight });
-        }
-        newData.split_logic[logicIndex] = logic;
-      }
-      return newData;
-    });
-  }, []);
-
-  const updateModifier = useCallback((key: "tax" | "tip", field: string, value: any) => {
-    setData((prev) => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        modifiers: {
-          ...prev.modifiers,
-          [key]: { ...prev.modifiers[key], [field]: value },
-        },
-      };
-    });
-  }, []);
+      });
+    },
+    []
+  );
 
   const updateParticipantName = useCallback((id: string, name: string) => {
     const sanitizedName = sanitizeParticipantName(name);
@@ -219,7 +245,9 @@ export function BillProvider({ children }: { children: React.ReactNode }) {
   const saveItem = useCallback((editingItem: Partial<LineItem>) => {
     if (!editingItem || !editingItem.description) return;
 
-    const sanitizedDescription = sanitizeItemDescription(editingItem.description);
+    const sanitizedDescription = sanitizeItemDescription(
+      editingItem.description
+    );
     if (!sanitizedDescription) return;
 
     const price = editingItem.total_price || DEFAULT_PRICE;
@@ -230,7 +258,10 @@ export function BillProvider({ children }: { children: React.ReactNode }) {
       const newItem: LineItem = {
         id: editingItem.id || `item-${Date.now()}`,
         description: sanitizedDescription,
-        quantity: Math.max(DEFAULT_QUANTITY, editingItem.quantity || DEFAULT_QUANTITY),
+        quantity: Math.max(
+          DEFAULT_QUANTITY,
+          editingItem.quantity || DEFAULT_QUANTITY
+        ),
         unit_price: price,
         total_price: price,
       };
@@ -238,7 +269,9 @@ export function BillProvider({ children }: { children: React.ReactNode }) {
       if (editingItem.id) {
         return {
           ...prev,
-          line_items: prev.line_items.map((i) => i.id === editingItem.id ? newItem : i),
+          line_items: prev.line_items.map((i) =>
+            i.id === editingItem.id ? newItem : i
+          ),
         };
       } else {
         return {
@@ -281,11 +314,7 @@ export function BillProvider({ children }: { children: React.ReactNode }) {
     deleteItem,
   };
 
-  return (
-    <BillContext.Provider value={value}>
-      {children}
-    </BillContext.Provider>
-  );
+  return <BillContext.Provider value={value}>{children}</BillContext.Provider>;
 }
 
 export function useBill() {
@@ -295,4 +324,3 @@ export function useBill() {
   }
   return context;
 }
-

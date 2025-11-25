@@ -1,25 +1,25 @@
-import React, { useState, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  useColorScheme,
-  TouchableOpacity,
-  Animated,
-  useWindowDimensions,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import PagerView from "react-native-pager-view";
-import { LineItem } from "../types";
 import { Ionicons } from "@expo/vector-icons";
-import { formatMoney } from "../lib/bill-utils";
-import { useBill } from "../context/BillContext";
-import ParticipantsList from "../components/ParticipantsList";
+import { useRouter } from "expo-router";
+import React, { useRef, useState } from "react";
+import {
+  Animated,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import PagerView from "react-native-pager-view";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import ItemModal from "../components/ItemModal";
 import LineItemsList from "../components/LineItemsList";
 import ModifierSection from "../components/ModifierSection";
+import ParticipantsList from "../components/ParticipantsList";
 import ResultsPanel from "../components/ResultsPanel";
-import ItemModal from "../components/ItemModal";
+import { useBill } from "../context/BillContext";
+import { formatMoney } from "../lib/bill-utils";
+import { LineItem } from "../types";
 
 const AnimatedPagerView = Animated.createAnimatedComponent(PagerView);
 
@@ -29,7 +29,7 @@ export default function EditorScreen() {
   const isDark = colorScheme === "dark";
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  
+
   const {
     data,
     calculatedTotals,
@@ -45,9 +45,11 @@ export default function EditorScreen() {
 
   const [activeTab, setActiveTab] = useState(0);
   const [activeItemId, setActiveItemId] = useState<string | null>(null);
-  const [editingItem, setEditingItem] = useState<Partial<LineItem> | null>(null);
+  const [editingItem, setEditingItem] = useState<Partial<LineItem> | null>(
+    null
+  );
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
-  
+
   const pagerRef = useRef<PagerView>(null);
   const scrollOffsetAnimatedValue = useRef(new Animated.Value(0)).current;
   const positionAnimatedValue = useRef(new Animated.Value(0)).current;
@@ -111,8 +113,8 @@ export default function EditorScreen() {
     );
   }
 
-  const participantCount = calculatedTotals 
-    ? Object.keys(calculatedTotals.byUser).length - 1 
+  const participantCount = calculatedTotals
+    ? Object.keys(calculatedTotals.byUser).length - 1
     : 0;
 
   return (
@@ -125,7 +127,11 @@ export default function EditorScreen() {
             <Ionicons name="chevron-back" size={24} color="#2563EB" />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
-            <Ionicons name="pie-chart" size={20} color={isDark ? "#fff" : "#1F2937"} />
+            <Ionicons
+              name="pie-chart"
+              size={20}
+              color={isDark ? "#fff" : "#1F2937"}
+            />
             <Text style={styles.headerTitle}>FairShare</Text>
           </View>
           <View style={styles.headerSpacer} />
@@ -138,7 +144,9 @@ export default function EditorScreen() {
             onPress={() => onTabPress(0)}
             activeOpacity={0.7}
           >
-            <Text style={[styles.tabText, activeTab === 0 && styles.tabTextActive]}>
+            <Text
+              style={[styles.tabText, activeTab === 0 && styles.tabTextActive]}
+            >
               Editor
             </Text>
           </TouchableOpacity>
@@ -147,20 +155,22 @@ export default function EditorScreen() {
             onPress={() => onTabPress(1)}
             activeOpacity={0.7}
           >
-            <Text style={[styles.tabText, activeTab === 1 && styles.tabTextActive]}>
+            <Text
+              style={[styles.tabText, activeTab === 1 && styles.tabTextActive]}
+            >
               Results
             </Text>
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{participantCount}</Text>
             </View>
           </TouchableOpacity>
-          
+
           {/* Animated indicator */}
-          <Animated.View 
+          <Animated.View
             style={[
-              styles.tabIndicator, 
-              { transform: [{ translateX: indicatorPosition }] }
-            ]} 
+              styles.tabIndicator,
+              { transform: [{ translateX: indicatorPosition }] },
+            ]}
           />
         </View>
       </View>
@@ -219,7 +229,7 @@ export default function EditorScreen() {
                   {formatMoney(calculatedTotals.grandTotal)}
                 </Text>
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.viewResultsButton}
                 onPress={() => onTabPress(1)}
               >
@@ -232,7 +242,10 @@ export default function EditorScreen() {
 
         {/* Results Tab */}
         <View key="results" style={styles.page}>
-          <ResultsPanel calculatedTotals={calculatedTotals} bottomInset={insets.bottom} />
+          <ResultsPanel
+            calculatedTotals={calculatedTotals}
+            bottomInset={insets.bottom}
+          />
         </View>
       </AnimatedPagerView>
 
@@ -248,7 +261,11 @@ export default function EditorScreen() {
   );
 }
 
-const createStyles = (isDark: boolean, insets: { top: number; bottom: number }, width: number) =>
+const createStyles = (
+  isDark: boolean,
+  insets: { top: number; bottom: number },
+  width: number
+) =>
   StyleSheet.create({
     container: {
       flex: 1,

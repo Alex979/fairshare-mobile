@@ -1,20 +1,23 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  View,
+  LayoutAnimation,
+  Platform,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  useColorScheme,
-  LayoutAnimation,
-  Platform,
   UIManager,
+  useColorScheme,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { Modifiers } from "../types";
 
 // Enable LayoutAnimation on Android
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -110,14 +113,14 @@ export default function ModifierSection({
     <View style={styles.container}>
       <TouchableOpacity style={styles.header} onPress={toggleExpanded}>
         <View style={styles.headerLeft}>
-          <Ionicons 
-            name="calculator-outline" 
-            size={18} 
-            color={isDark ? "#9CA3AF" : "#6B7280"} 
+          <Ionicons
+            name="calculator-outline"
+            size={18}
+            color={isDark ? "#9CA3AF" : "#6B7280"}
           />
           <Text style={styles.title}>Tax & Tip</Text>
         </View>
-        
+
         <View style={styles.headerRight}>
           {!isExpanded && (
             <View style={styles.summaryChips}>
@@ -135,10 +138,10 @@ export default function ModifierSection({
               </View>
             </View>
           )}
-          <Ionicons 
-            name={isExpanded ? "chevron-down" : "chevron-up"} 
-            size={20} 
-            color={isDark ? "#9CA3AF" : "#6B7280"} 
+          <Ionicons
+            name={isExpanded ? "chevron-down" : "chevron-up"}
+            size={20}
+            color={isDark ? "#9CA3AF" : "#6B7280"}
           />
         </View>
       </TouchableOpacity>

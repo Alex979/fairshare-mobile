@@ -1,5 +1,5 @@
 import { BillData } from "../types";
-import { API_MODEL, API_ENDPOINT } from "./constants";
+import { API_ENDPOINT, API_MODEL } from "./constants";
 
 const SYSTEM_PROMPT = `
 You are a receipt parsing engine. Return ONLY raw JSON. No markdown, no explanation.
@@ -46,11 +46,13 @@ interface OpenRouterResponse {
 }
 
 export async function processReceipt(
-  base64Data: string, 
+  base64Data: string,
   userPrompt: string,
   apiKey: string
 ): Promise<BillData> {
-  console.log(`Processing receipt: ${Math.round(base64Data.length / 1024)}KB payload`);
+  console.log(
+    `Processing receipt: ${Math.round(base64Data.length / 1024)}KB payload`
+  );
 
   if (!apiKey) {
     throw new Error("API key is required");
@@ -60,7 +62,7 @@ export async function processReceipt(
     const response = await fetch(API_ENDPOINT, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -74,21 +76,21 @@ export async function processReceipt(
               {
                 type: "image_url",
                 image_url: {
-                  url: `data:image/jpeg;base64,${base64Data}`
-                }
-              }
-            ]
-          }
-        ]
-      })
+                  url: `data:image/jpeg;base64,${base64Data}`,
+                },
+              },
+            ],
+          },
+        ],
+      }),
     });
 
     if (!response.ok) {
       throw new Error(`API request failed with status ${response.status}`);
     }
 
-    const result = await response.json() as OpenRouterResponse;
-    
+    const result = (await response.json()) as OpenRouterResponse;
+
     if (result.error) {
       throw new Error(result.error.message || "OpenRouter API Error");
     }
@@ -102,12 +104,12 @@ export async function processReceipt(
     jsonText = jsonText.replace(/```json\n?|```/g, "").trim();
 
     const parsedData = JSON.parse(jsonText);
-    
+
     return parsedData;
   } catch (err) {
     console.error("OpenRouter API Error:", err);
-    const errorMessage = err instanceof Error ? err.message : "Failed to process receipt";
+    const errorMessage =
+      err instanceof Error ? err.message : "Failed to process receipt";
     throw new Error(errorMessage);
   }
 }
-

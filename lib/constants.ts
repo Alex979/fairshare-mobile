@@ -93,4 +93,3 @@ export const MOCK_DATA: BillData = {
     tip: { source: "user_prompt", type: "percentage", value: 20 },
   },
 };
-

@@ -1,24 +1,27 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  View,
+  Linking,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
   useColorScheme,
-  ScrollView,
-  Linking,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { CalculatedTotals } from "../types";
 import { formatMoney, generateVenmoLink } from "../lib/bill-utils";
 import { UNASSIGNED_NAME } from "../lib/constants";
+import { CalculatedTotals } from "../types";
 
 interface ResultsPanelProps {
   calculatedTotals: CalculatedTotals | null;
   bottomInset?: number;
 }
 
-export default function ResultsPanel({ calculatedTotals, bottomInset = 0 }: ResultsPanelProps) {
+export default function ResultsPanel({
+  calculatedTotals,
+  bottomInset = 0,
+}: ResultsPanelProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
@@ -53,7 +56,10 @@ export default function ResultsPanel({ calculatedTotals, bottomInset = 0 }: Resu
         <Text style={styles.headerSubtitle}>Request money via Venmo</Text>
       </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+      >
         {Object.values(calculatedTotals?.byUser || {})
           .filter((u) => u.name !== UNASSIGNED_NAME || u.total > 0)
           .map((user, idx) => (
@@ -132,7 +138,10 @@ export default function ResultsPanel({ calculatedTotals, bottomInset = 0 }: Resu
                     <View style={styles.itemsList}>
                       {user.items.map((item, i) => (
                         <View key={i} style={styles.itemRow}>
-                          <Text style={styles.itemDescription} numberOfLines={1}>
+                          <Text
+                            style={styles.itemDescription}
+                            numberOfLines={1}
+                          >
                             {item.description}
                           </Text>
                           <Text style={styles.itemAmount}>
@@ -159,7 +168,8 @@ export default function ResultsPanel({ calculatedTotals, bottomInset = 0 }: Resu
           <Text style={styles.footerLabel}>Tax + Tip</Text>
           <Text style={styles.footerValue}>
             {formatMoney(
-              (calculatedTotals?.totalTax || 0) + (calculatedTotals?.totalTip || 0)
+              (calculatedTotals?.totalTax || 0) +
+                (calculatedTotals?.totalTip || 0)
             )}
           </Text>
         </View>
@@ -339,4 +349,3 @@ const createStyles = (isDark: boolean, bottomInset: number) =>
       color: isDark ? "#fff" : "#1F2937",
     },
   });
-
