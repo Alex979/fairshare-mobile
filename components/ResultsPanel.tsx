@@ -9,6 +9,7 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import { formatMoney, generateVenmoLink } from "../lib/bill-utils";
 import { UNASSIGNED_NAME } from "../lib/constants";
 import { CalculatedTotals } from "../types";
@@ -63,12 +64,13 @@ export default function ResultsPanel({
         {Object.values(calculatedTotals?.byUser || {})
           .filter((u) => u.name !== UNASSIGNED_NAME || u.total > 0)
           .map((user, idx) => (
-            <View
+            <Animated.View
               key={idx}
               style={[
                 styles.userCard,
                 user.name === UNASSIGNED_NAME && styles.userCardUnassigned,
               ]}
+              layout={LinearTransition.duration(250)}
             >
               <View style={styles.userHeader}>
                 <Text
@@ -115,7 +117,7 @@ export default function ResultsPanel({
               </View>
 
               {user.items.length > 0 && (
-                <View style={styles.itemsSection}>
+                <Animated.View style={styles.itemsSection} layout={LinearTransition.duration(250)}>
                   <TouchableOpacity
                     style={styles.itemsHeader}
                     onPress={() => toggleUserExpanded(user.name)}
@@ -135,9 +137,19 @@ export default function ResultsPanel({
                   </TouchableOpacity>
 
                   {expandedUsers.has(user.name) && (
-                    <View style={styles.itemsList}>
+                    <Animated.View
+                      style={styles.itemsList}
+                      entering={FadeIn.duration(200)}
+                      exiting={FadeOut.duration(150)}
+                      layout={LinearTransition.duration(200)}
+                    >
                       {user.items.map((item, i) => (
-                        <View key={i} style={styles.itemRow}>
+                        <Animated.View
+                          key={i}
+                          style={styles.itemRow}
+                          entering={FadeIn.duration(150).delay(i * 30)}
+                          layout={LinearTransition.duration(150)}
+                        >
                           <Text
                             style={styles.itemDescription}
                             numberOfLines={1}
@@ -147,13 +159,13 @@ export default function ResultsPanel({
                           <Text style={styles.itemAmount}>
                             {formatMoney(item.total_price * item.share)}
                           </Text>
-                        </View>
+                        </Animated.View>
                       ))}
-                    </View>
+                    </Animated.View>
                   )}
-                </View>
+                </Animated.View>
               )}
-            </View>
+            </Animated.View>
           ))}
       </ScrollView>
 

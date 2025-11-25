@@ -8,6 +8,7 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import { formatMoney } from "../lib/bill-utils";
 import { WEIGHT_INCREMENT, WEIGHT_INITIAL, WEIGHT_MIN } from "../lib/constants";
 import { BillData, LineItem } from "../types";
@@ -54,9 +55,10 @@ export default function LineItemsList({
           const isUnassigned = !logic || logic.allocations.length === 0;
 
           return (
-            <View
+            <Animated.View
               key={item.id}
               style={[styles.itemCard, isExpanded && styles.itemCardExpanded]}
+              layout={LinearTransition.duration(250)}
             >
               <TouchableOpacity
                 style={styles.itemHeader}
@@ -115,7 +117,12 @@ export default function LineItemsList({
               </TouchableOpacity>
 
               {isExpanded && (
-                <View style={styles.expandedContent}>
+                <Animated.View
+                  style={styles.expandedContent}
+                  entering={FadeIn.duration(200)}
+                  exiting={FadeOut.duration(150)}
+                  layout={LinearTransition.duration(200)}
+                >
                   <Text style={styles.expandedTitle}>ASSIGN SHARES</Text>
                   <View style={styles.participantsList}>
                     {data.participants.map((p) => {
@@ -125,12 +132,13 @@ export default function LineItemsList({
                       const weight = alloc ? alloc.weight : 0;
 
                       return (
-                        <View
+                        <Animated.View
                           key={p.id}
                           style={[
                             styles.participantRow,
                             weight > 0 && styles.participantRowActive,
                           ]}
+                          layout={LinearTransition.duration(200)}
                         >
                           <View style={styles.participantLeft}>
                             <View style={styles.participantAvatar}>
@@ -186,13 +194,13 @@ export default function LineItemsList({
                               <Text style={styles.weightButtonTextPlus}>+</Text>
                             </TouchableOpacity>
                           </View>
-                        </View>
+                        </Animated.View>
                       );
                     })}
                   </View>
-                </View>
+                </Animated.View>
               )}
-            </View>
+            </Animated.View>
           );
         })}
       </View>

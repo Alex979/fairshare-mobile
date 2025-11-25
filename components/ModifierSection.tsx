@@ -1,25 +1,22 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  LayoutAnimation,
-  Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  UIManager,
   useColorScheme,
   View,
 } from "react-native";
+import Animated, {
+  Easing,
+  FadeIn,
+  FadeOut,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { Modifiers } from "../types";
-
-// Enable LayoutAnimation on Android
-if (
-  Platform.OS === "android" &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 interface ModifierSectionProps {
   modifiers: Modifiers;
@@ -33,12 +30,43 @@ export default function ModifierSection({
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const [isExpanded, setIsExpanded] = useState(false);
+  const [contentHeight, setContentHeight] = useState(0);
+  const animatedHeight = useSharedValue(0);
   const styles = createStyles(isDark);
 
   const toggleExpanded = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setIsExpanded(!isExpanded);
+    const newExpanded = !isExpanded;
+    if (newExpanded) {
+      // Expanding: animate height to content height
+      animatedHeight.value = withTiming(contentHeight, {
+        duration: 250,
+        easing: Easing.out(Easing.cubic),
+      });
+    } else {
+      // Collapsing: animate height to 0
+      animatedHeight.value = withTiming(0, {
+        duration: 200,
+        easing: Easing.in(Easing.cubic),
+      });
+    }
+    setIsExpanded(newExpanded);
   };
+
+  const onContentLayout = (event: any) => {
+    const height = event.nativeEvent.layout.height;
+    if (height > 0 && height !== contentHeight) {
+      setContentHeight(height);
+      // If already expanded when height changes, update animated height
+      if (isExpanded) {
+        animatedHeight.value = withTiming(height, { duration: 150 });
+      }
+    }
+  };
+
+  const animatedContainerStyle = useAnimatedStyle(() => ({
+    height: animatedHeight.value,
+    opacity: animatedHeight.value > 0 ? 1 : 0,
+  }));
 
   const formatModifierValue = (mod: { type: string; value: number }) => {
     if (mod.type === "percentage") {
@@ -123,7 +151,11 @@ export default function ModifierSection({
 
         <View style={styles.headerRight}>
           {!isExpanded && (
-            <View style={styles.summaryChips}>
+            <Animated.View
+              style={styles.summaryChips}
+              entering={FadeIn.duration(150).delay(100)}
+              exiting={FadeOut.duration(100)}
+            >
               <View style={styles.summaryChip}>
                 <Text style={styles.summaryChipLabel}>Tax</Text>
                 <Text style={styles.summaryChipValue}>
@@ -136,7 +168,7 @@ export default function ModifierSection({
                   {formatModifierValue(modifiers.tip)}
                 </Text>
               </View>
-            </View>
+            </Animated.View>
           )}
           <Ionicons
             name={isExpanded ? "chevron-down" : "chevron-up"}
@@ -146,12 +178,21 @@ export default function ModifierSection({
         </View>
       </TouchableOpacity>
 
-      {isExpanded && (
+      {/* Hidden measuring container */}
+      <View style={styles.measureContainer} pointerEvents="none">
+        <View style={styles.modifiersList} onLayout={onContentLayout}>
+          {renderModifier("tax", "Tax")}
+          {renderModifier("tip", "Tip")}
+        </View>
+      </View>
+
+      {/* Animated height container */}
+      <Animated.View style={[styles.expandableWrapper, animatedContainerStyle]}>
         <View style={styles.modifiersList}>
           {renderModifier("tax", "Tax")}
           {renderModifier("tip", "Tip")}
         </View>
-      )}
+      </Animated.View>
     </View>
   );
 }
@@ -211,10 +252,22 @@ const createStyles = (isDark: boolean) =>
       fontWeight: "600",
       color: isDark ? "#fff" : "#1F2937",
     },
+    measureContainer: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      opacity: 0,
+    },
+    expandableWrapper: {
+      overflow: "hidden",
+    },
     modifiersList: {
       padding: 12,
-      paddingTop: 0,
+      paddingTop: 12,
       gap: 12,
+      borderTopWidth: 1,
+      borderTopColor: isDark ? "#374151" : "#E5E7EB",
     },
     modifierCard: {
       backgroundColor: isDark ? "#374151" : "#F9FAFB",
