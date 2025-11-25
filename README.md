@@ -72,28 +72,27 @@ A React Native mobile app for splitting bills using AI-powered receipt scanning.
 ## Project Structure
 
 ```
-mobile-app/
+fairshare-app/
 ├── app/                    # Expo Router pages
-│   ├── _layout.tsx        # Root layout
-│   └── index.tsx          # Main app entry
+│   ├── _layout.tsx        # Root layout with providers
+│   ├── index.tsx          # Input screen (receipt upload)
+│   ├── processing.tsx     # AI processing screen
+│   └── editor.tsx         # Bill editor screen
 ├── components/            # Reusable UI components
-│   ├── ItemModal.tsx
-│   ├── LineItemsList.tsx
-│   ├── ModifierSection.tsx
-│   ├── ParticipantsList.tsx
-│   └── ResultsPanel.tsx
-├── hooks/                 # Custom React hooks
-│   └── useBillSplitter.ts
+│   ├── ItemModal.tsx      # Line item editing modal
+│   ├── LineItemsList.tsx  # Bill line items list
+│   ├── ModifierSection.tsx# Tax & tip configuration
+│   ├── ParticipantsList.tsx # People management
+│   └── ResultsPanel.tsx   # Final split results
+├── context/               # React context providers
+│   └── BillContext.tsx    # Bill state management
 ├── lib/                   # Utilities and helpers
 │   ├── api.ts            # API calls to OpenRouter
 │   ├── bill-utils.ts     # Bill calculation logic
 │   ├── constants.ts      # App constants
+│   ├── env.ts            # Environment configuration
 │   ├── image-utils.ts    # Image compression
 │   └── validation.ts     # Input validation
-├── screens/              # Main app screens
-│   ├── EditorScreen.tsx
-│   ├── InputScreen.tsx
-│   └── ProcessingScreen.tsx
 └── types.ts              # TypeScript type definitions
 ```
 
