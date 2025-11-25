@@ -1,26 +1,23 @@
-import React, { createContext, useContext, useState, useMemo, useCallback } from "react";
-import { BillData, LineItem, CalculatedTotals } from "../types";
+import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { processReceipt } from "../lib/api";
-import { 
-  MOCK_DATA, 
-  DEFAULT_NEW_PARTICIPANT_NAME, 
+import { calculateTotals } from "../lib/bill-utils";
+import {
+  DEFAULT_NEW_PARTICIPANT_NAME,
   DEFAULT_PRICE,
   DEFAULT_QUANTITY,
-  WEIGHT_INCREMENT,
-  WEIGHT_INITIAL,
-  WEIGHT_MIN
+  MOCK_DATA
 } from "../lib/constants";
-import { calculateTotals } from "../lib/bill-utils";
-import { compressImage } from "../lib/image-utils";
-import { 
-  isValidWeight, 
-  isValidPrice, 
-  isValidBillData,
-  canDeleteParticipant,
-  sanitizeParticipantName,
-  sanitizeItemDescription
-} from "../lib/validation";
 import { getOpenRouterApiKey } from "../lib/env";
+import { compressImage } from "../lib/image-utils";
+import {
+  canDeleteParticipant,
+  isValidBillData,
+  isValidPrice,
+  isValidWeight,
+  sanitizeItemDescription,
+  sanitizeParticipantName
+} from "../lib/validation";
+import { BillData, CalculatedTotals, LineItem, Participant } from "../types";
 
 interface BillContextType {
   // Input state
@@ -44,7 +41,7 @@ interface BillContextType {
   updateItemSplit: (itemId: string, participantId: string, weight: number) => void;
   updateModifier: (key: "tax" | "tip", field: string, value: any) => void;
   updateParticipantName: (id: string, name: string) => void;
-  addParticipant: () => void;
+  addParticipant: () => Participant;
   deleteParticipant: (id: string) => void;
   saveItem: (item: Partial<LineItem>) => void;
   deleteItem: (itemId: string) => void;
@@ -189,16 +186,18 @@ export function BillProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addParticipant = useCallback(() => {
+    const newParticipant: Participant = {
+      id: `p${Date.now()}`,
+      name: DEFAULT_NEW_PARTICIPANT_NAME,
+    };
     setData((prev) => {
       if (!prev) return null;
       return {
         ...prev,
-        participants: [
-          ...prev.participants,
-          { id: `p${Date.now()}`, name: DEFAULT_NEW_PARTICIPANT_NAME },
-        ],
+        participants: [...prev.participants, newParticipant],
       };
     });
+    return newParticipant;
   }, []);
 
   const deleteParticipant = useCallback((id: string) => {

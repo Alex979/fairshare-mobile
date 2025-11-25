@@ -16,7 +16,7 @@ import { Participant } from "../types";
 interface ParticipantsListProps {
   participants: Participant[];
   onUpdateName: (id: string, name: string) => void;
-  onAddParticipant: () => void;
+  onAddParticipant: () => Participant;
   onDeleteParticipant: (id: string) => void;
 }
 
@@ -36,6 +36,12 @@ export default function ParticipantsList({
     setEditingParticipant(participant);
     setEditName(participant.name);
   };
+
+  const handleAdd = () => {
+    const participant = onAddParticipant();
+    setEditingParticipant(participant);
+    setEditName(participant.name);
+  }
 
   const handleSave = () => {
     if (editingParticipant && editName.trim()) {
@@ -90,7 +96,7 @@ export default function ParticipantsList({
           </TouchableOpacity>
         ))}
         
-        <TouchableOpacity style={styles.addChip} onPress={onAddParticipant}>
+        <TouchableOpacity style={styles.addChip} onPress={handleAdd}>
           <Ionicons name="add" size={20} color="#2563EB" />
         </TouchableOpacity>
       </ScrollView>
