@@ -8,7 +8,11 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  LinearTransition,
+} from "react-native-reanimated";
 import { formatMoney } from "../lib/bill-utils";
 import { WEIGHT_INCREMENT, WEIGHT_INITIAL, WEIGHT_MIN } from "../lib/constants";
 import { BillData, LineItem } from "../types";

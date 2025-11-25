@@ -9,7 +9,11 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  LinearTransition,
+} from "react-native-reanimated";
 import { formatMoney, generateVenmoLink } from "../lib/bill-utils";
 import { UNASSIGNED_NAME } from "../lib/constants";
 import { CalculatedTotals } from "../types";
@@ -115,7 +119,10 @@ export default function ResultsPanel({
               </View>
 
               {user.items.length > 0 && (
-                <Animated.View style={styles.itemsSection} layout={LinearTransition.duration(250)}>
+                <Animated.View
+                  style={styles.itemsSection}
+                  layout={LinearTransition.duration(250)}
+                >
                   <TouchableOpacity
                     style={styles.itemsHeader}
                     onPress={() => toggleUserExpanded(user.name)}
